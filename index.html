@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WESTROOMZ | Audio. Video. Events.</title>
+    
+    <link rel="icon" type="image/jpeg" href="logo.jpg">
+
+    <!-- FONTS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Oswald:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #990000; /* Deep Red */
+            --accent: #ff0000; /* Bright Neon Red */
+            --bg: #050505;
+            --surface: rgba(30, 30, 30, 0.6); /* Glassy Surface */
+            --border: rgba(255, 255, 255, 0.12); /* Visible Technical Border */
+            --text: #ffffff;
+            --text-muted: #aaaaaa;
+            --font-head: 'Oswald', sans-serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* HIDE SYSTEM CURSOR */
+        html, body, a, button, input, select, textarea {
+            cursor: none !important; 
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+            width: 100%;
+            -webkit-font-smoothing: antialiased;
+            /* BACKGROUND GRID PATTERN (ANIMATED) */
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            background-position: center top;
+            background-attachment: fixed; 
+            animation: gridScroll 20s linear infinite;
+        }
+
+        @keyframes gridScroll {
+            0% { background-position: center 0px; }
+            100% { background-position: center 50px; }
+        }
+
+        /* --- 1. CINEMATIC VIGNETTE --- */
+        .cinematic-vignette {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; 
+            z-index: 90; 
+            background: linear-gradient(to bottom, 
+                rgba(5,5,5,1) 0%, 
+                rgba(5,5,5,0) 15%, 
+                rgba(5,5,5,0) 85%, 
+                rgba(5,5,5,1) 100%
+            );
+        }
+
+        /* --- THE RED THREAD --- */
+        .red-thread {
+            position: fixed;
+            top: 0; left: 50%; width: 1px; height: 100vh;
+            background: linear-gradient(to bottom, transparent, var(--primary), transparent);
+            opacity: 0.3; z-index: -1; transform: translateX(-50%);
+        }
+
+        /* --- UPGRADED CURSOR --- */
+        .cursor {
+            width: 12px; height: 12px;
+            background: var(--accent); /* Solid Red Dot */
+            border-radius: 50%;
+            position: fixed; pointer-events: none; z-index: 9999;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px var(--accent); /* Constant Glow */
+            transition: width 0.2s, height 0.2s, background 0.2s, opacity 0.2s;
+            will-change: transform;
+        }
+        .cursor-ring {
+            width: 40px; height: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            position: fixed; pointer-events: none; z-index: 9998;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s, border-color 0.3s;
+            will-change: transform;
+        }
+        body.hovering .cursor { width: 4px; height: 4px; background: white; }
+        body.hovering .cursor-ring { 
+            width: 60px; height: 60px; 
+            border-color: var(--accent);
+            background: rgba(255, 0, 0, 0.05);
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.2);
+        }
+
+        /* --- NAV --- */
+        nav {
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            width: auto; 
+            padding: 30px 50px;
+            display: flex; justify-content: space-between; align-items: center;
+            z-index: 100; mix-blend-mode: exclusion; 
+            box-sizing: border-box; 
+        }
+        .nav-logo img { height: 35px; display: block; }
+        .nav-links { display: flex; gap: 50px; }
+        .nav-links a {
+            color: white; text-decoration: none; font-family: var(--font-head);
+            font-weight: 400; text-transform: uppercase; font-size: 1rem;
+            letter-spacing: 1px; position: relative;
+        }
+        .nav-links a::after {
+            content: ''; position: absolute; bottom: -5px; left: 0; width: 0%;
+            height: 1px; background: white; transition: 0.3s ease;
+        }
+        .nav-links a:hover::after { width: 100%; }
+
+        .mobile-menu-btn { display: none; flex-direction: column; gap: 6px; pointer-events: auto; }
+        .bar { width: 30px; height: 2px; background-color: white; transition: 0.3s; }
+
+        .mobile-nav-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: #000; z-index: 99;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center; gap: 40px;
+            transform: translateY(-100%); transition: 0.6s cubic-bezier(0.85, 0, 0.15, 1);
+        }
+        .mobile-nav-overlay.active { transform: translateY(0); }
+        .mobile-nav-overlay a { font-family: var(--font-head); font-size: 2rem; color: white; text-decoration: none; }
+
+        /* --- HERO --- */
+        .hero {
+            height: 100vh; width: 100%; position: relative;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden; background: #000;
+        }
+        .video-container {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; 
+        }
+        .hero-video {
+            width: 100%; height: 100%; object-fit: cover; opacity: 0.8;
+            will-change: transform;
+        }
+        .video-mobile { display: none; }
+        .hero-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0) 70%, rgba(5,5,5,1));
+            z-index: 1; 
+        }
+        .hero-content { 
+            z-index: 2; 
+            text-align: center; 
+            padding: 0 20px;
+            position: absolute;
+            bottom: 50px;
+            width: 100%;
+        }
+        
+        /* SHIMMER TEXT EFFECT (LIQUID CHROME) */
+        .hero-sub {
+            font-size: 1.2rem; letter-spacing: 8px; font-family: var(--font-head);
+            font-weight: 400; text-transform: uppercase; opacity: 0;
+            background: linear-gradient(to right, #fff 0%, #fff 40%, #ff0000 50%, #fff 60%, #fff 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 5s linear infinite;
+        }
+
+        @keyframes shine {
+            to {
+                background-position: 200% center;
+            }
+        }
+
+        /* --- GLOBAL CONTENT --- */
+        section {
+            padding: 150px 5%; 
+            position: relative; 
+            z-index: 2; 
+        }
+
+        .section-title {
+            font-size: 4rem; margin-bottom: 2rem; position: relative; display: inline-block;
+        }
+        .section-title::after {
+            content: ''; position: absolute; bottom: 10px; right: -20px;
+            width: 10px; height: 10px; background: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        /* --- ABOUT --- */
+        .sidefacts {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 80px; 
+            align-items: center;
+        }
+        
+        .intro-img {
+            display: flex;
+            justify-content: flex-end; 
+        }
+        
+        .intro-img img { width: 100%; max-width: 400px; border-radius: 2px; display: block; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .intro-text p {
+            font-size: 1.2rem; line-height: 1.6; color: var(--text-muted); margin-bottom: 20px;
+        }
+        .intro-text strong { color: white; border-bottom: 1px solid var(--primary); padding-bottom: 2px; }
+
+        /* --- TEAM SECTION --- */
+        .team-section { background: transparent; }
+        .team-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+            gap: 40px; margin-top: 50px;
+        }
+
+        .team-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 40px 20px; text-align: center;
+            transition: 0.3s; position: relative; overflow: hidden;
+            will-change: transform, opacity;
+            transition: transform 0.3s, opacity 0.3s, filter 0.3s;
+        }
+
+        .team-avatar {
+            width: 100px; height: 100px; margin: 0 auto 20px;
+            border-radius: 50%; background: #1a1a1a;
+            border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-head); font-size: 2.5rem; color: #333;
+            transition: 0.3s;
+        }
+
+        /* TRUE FOCUS LOGIC */
+        .team-grid:hover .team-card:not(:hover),
+        .service-grid:hover .service-card:not(:hover) {
+            opacity: 0.4;
+            filter: blur(2px) grayscale(0.8);
+            transform: scale(0.98);
+        }
+
+        .team-card:hover {
+            border-color: var(--accent); transform: translateY(-5px);
+            background: rgba(40,40,40,0.8);
+            opacity: 1; filter: none; z-index: 10;
+        }
+
+        .team-card:hover .team-avatar {
+            border-color: var(--accent); color: white;
+            background: var(--primary);
+            box-shadow: 0 0 20px rgba(255,0,0,0.4);
+        }
+
+        .team-name { font-family: var(--font-head); font-size: 1.5rem; color: white; margin-bottom: 5px; text-transform: uppercase; }
+        .team-role { font-size: 0.85rem; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
+
+        /* --- SERVICES --- */
+        .tabs-nav {
+            display: flex; justify-content: center; gap: 20px; margin-bottom: 60px; flex-wrap: wrap;
+        }
+        .tab-btn {
+            background: rgba(20, 20, 20, 0.5); border: 1px solid var(--border);
+            color: var(--text-muted); padding: 15px 40px; font-family: var(--font-head);
+            font-size: 1.5rem; transition: 0.3s; text-transform: uppercase;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+        .tab-btn.active {
+            background: var(--primary); color: white; border-color: var(--primary); 
+            transform: skew(-10deg); box-shadow: 0 0 20px rgba(153, 0, 0, 0.4);
+        }
+        .tab-btn:hover { border-color: var(--accent); color: white; }
+
+        .service-container { display: none; }
+        .service-container.active { display: block; }
+
+        .service-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;
+        }
+
+        .service-card {
+            background: var(--surface); padding: 40px; 
+            border: 1px solid var(--border); border-left: 3px solid transparent;
+            position: relative; overflow: hidden;
+            will-change: transform, opacity;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: transform 0.3s, border-color 0.3s, background-color 0.3s, box-shadow 0.3s, opacity 0.3s, filter 0.3s;
+        }
+        .service-card:hover {
+            border-color: rgba(255, 0, 0, 0.3); border-left-color: var(--accent);
+            transform: translateY(-5px); background: rgba(40, 40, 40, 0.8);
+            box-shadow: 0 10px 40px rgba(150, 0, 0, 0.1);
+        }
+        .service-card h3 { font-size: 2rem; margin-bottom: 30px; color: #fff; }
+        .service-list { list-style: none; }
+        
+        .service-list li {
+            padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+            color: var(--text-muted); font-size: 1.1rem; display: flex; align-items: center; justify-content: space-between;
+            overflow: hidden; 
+        }
+        
+        .rolling-number {
+            display: inline-block;
+            position: relative;
+            height: 1.2em;
+            width: 1.5em;
+            overflow: hidden;
+            color: var(--primary);
+            font-weight: bold;
+            font-family: var(--font-head);
+            text-align: right;
+        }
+        
+        .rolling-number span {
+            display: block;
+            transition: transform 0.4s cubic-bezier(0.5, 0, 0, 1);
+        }
+        
+        .service-list li:hover .rolling-number span {
+            transform: translateY(-100%);
+            color: white;
+        }
+        
+        .rolling-number span:nth-child(2) {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            color: var(--accent);
+        }
+
+        .book-btn {
+            margin-top: 30px; display: inline-block; padding: 12px 30px;
+            background: transparent; border: 1px solid rgba(255,255,255,0.3); color: white;
+            text-decoration: none; font-family: var(--font-head); letter-spacing: 1px;
+            transition: 0.3s;
+        }
+        .book-btn:hover { 
+            background: var(--accent); color: white; border-color: var(--accent); 
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.4);
+        }
+
+        /* --- CONTACT --- */
+        .contact-section { 
+            background: #000; padding: 150px 10%; 
+            border-top: 1px solid var(--border); position: relative; z-index: 2; 
+        }
+        .contact-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 80px; }
+        .contact-form label { display: block; margin-bottom: 10px; font-family: var(--font-head); color: var(--text-muted); letter-spacing: 1px; }
+        
+        .contact-form input, .contact-form select, .contact-form textarea {
+            width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+            padding: 15px; color: white; margin-bottom: 30px; font-family: var(--font-body);
+            transition: 0.3s; border-radius: 0;
+        }
+        .contact-form select {
+            appearance: none; -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em;
+        }
+        .contact-form select option { background-color: #121212; color: white; padding: 10px; }
+        .contact-form input:focus, .contact-form select:focus, .contact-form textarea:focus {
+            outline: none; border-color: var(--accent); background: rgba(255,255,255,0.07);
+            box-shadow: 0 0 15px rgba(255,0,0,0.1);
+        }
+        
+        .submit-btn {
+            background: var(--accent); color: white; border: none; padding: 20px 50px;
+            font-family: var(--font-head); font-size: 1.5rem;
+            text-transform: uppercase; width: 100%; transition: 0.3s;
+        }
+        .submit-btn:hover { background: white; color: var(--accent); box-shadow: 0 0 20px rgba(255,255,255,0.3); }
+        
+        footer { padding: 50px; text-align: center; border-top: 1px solid var(--border); font-size: 0.9rem; color: var(--text-muted); position: relative; z-index: 2; background: var(--bg); }
+
+        /* --- RESPONSIVE ADJUSTMENTS --- */
+        @media (max-width: 768px) {
+            body { background-attachment: scroll; animation: none; /* Disable heavy grid anim */ }
+            .service-card, .tab-btn, .team-card { 
+                backdrop-filter: none; 
+                -webkit-backdrop-filter: none; 
+                background: rgba(20, 20, 20, 0.95); /* Fallback solid color */
+            }
+
+            /* Disable True Focus on Mobile */
+            .service-grid:hover .service-card:not(:hover), 
+            .team-grid:hover .team-card:not(:hover) { opacity: 1; filter: none; transform: none; }
+
+            html, body, a, button, input, select, textarea { cursor: auto !important; }
+            .cursor, .cursor-ring { display: none !important; }
+
+            /* MOBILE VIDEO FIX: Contain to show full width */
+            .hero { height: 65vh; min-height: 400px; }
+            .hero-video { object-fit: cover; object-position: center; }
+            .hero-content { bottom: 10px; }
+
+            .video-desktop { display: none; }
+            .video-mobile { display: block; }
+
+            .sidefacts { 
+                display: flex; flex-direction: column-reverse;
+                gap: 20px; 
+                padding: 150px 5% 100px 5%;
+            }
+            .intro-text p { margin-bottom: 10px; }
+            
+            .intro-img { justify-content: center; }
+            .intro-img img { max-width: 150px; margin: 0 auto; margin-top: 10px; }
+
+            .services-section, .contact-section, .team-section { padding: 100px 5%; }
+            .contact-grid { grid-template-columns: 1fr; gap: 40px; }
+            .team-grid { grid-template-columns: 1fr; gap: 30px; }
+
+            /* NAV ADJUSTMENTS FOR MOBILE */
+            .nav-links { display: none; }
+            .mobile-menu-btn { display: flex; }
+            nav { padding: 20px; } /* Reduced padding for mobile */
+            .section-title { font-size: 3rem; }
+            .section-title::after { right: -10px; }
+            
+            .hero-sub { font-size: 1rem; letter-spacing: 3px; }
+            .tab-btn { padding: 10px 20px; font-size: 1.1rem; flex: 1 1 auto; text-align: center; }
+            .service-grid { grid-template-columns: 1fr; }
+            .service-card { padding: 30px; }
+            .red-thread { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- VISUAL EFFECTS -->
+    <div class="cursor"></div>
+    <div class="cursor-ring"></div>
+    <div class="red-thread"></div>
+    <!-- THE FADE OVERLAY -->
+    <div class="cinematic-vignette"></div>
+
+    <nav>
+        <div class="nav-logo"><img src="IMG_4834.png" alt="WESTROOMZ"></div>
+        <div class="nav-links">
+            <a href="#about" class="interactive">STUDIO</a>
+            <a href="#team" class="interactive">TEAM</a>
+            <a href="#services" class="interactive">SERVICES</a>
+            <a href="#contact" class="interactive">KONTAKT</a>
+        </div>
+        <div class="mobile-menu-btn interactive" onclick="toggleMenu()">
+            <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+        </div>
+    </nav>
+
+    <div class="mobile-nav-overlay">
+        <a href="#about" onclick="toggleMenu()">STUDIO</a>
+        <a href="#team" onclick="toggleMenu()">TEAM</a>
+        <a href="#services" onclick="toggleMenu()">SERVICES</a>
+        <a href="#contact" onclick="toggleMenu()">KONTAKT</a>
+    </div>
+
+    <!-- WRAPPER TO PREVENT HORIZONTAL SCROLL -->
+    <main class="page-wrapper">
+        <!-- HERO -->
+        <header class="hero">
+            <div class="video-container">
+                <!-- Using Desktop Video for BOTH now as requested -->
+                <video class="hero-video video-desktop" autoplay muted loop playsinline preload="auto">
+                    <source src="WEST_ROOMZ_INTRO.mp4" type="video/mp4">
+                </video>
+                <video class="hero-video video-mobile" autoplay muted loop playsinline preload="auto">
+                    <source src="WEST_ROOMZ_INTRO.mp4" type="video/mp4">
+                </video>
+            </div>
+
+            <div class="hero-overlay"></div>
+            <div class="hero-content">
+                <p class="hero-sub">UNERREICHTE QUALITÄT</p>
+            </div>
+        </header>
+
+        <!-- ABOUT -->
+        <section id="about" class="sidefacts">
+            <div class="intro-img">
+                <img src="logo.jpg" alt="Westroomz Badge">
+            </div>
+            <div class="intro-text">
+                <h2 class="section-title">DAS STUDIO</h2>
+                <p>Wir sind eine High-End-Produktionsfirma. Wir machen Musik, nehmen Künstler auf und prägen die Kultur seit 6 Jahren.</p> 
+                <p>Unsere Qualität ist <strong>UNERREICHT</strong>. Unser Equipment ist Top-Tier. Sound Engineering, Visuals und Eventproduktion – wir machen alles.</p>
+                <p>Vom Leidenschaftsprojekt zum professionellen Powerhouse. Ob Mixing/Mastering oder komplette Videoproduktion, wir erwecken die Vision zum Leben.</p>
+            </div>
+        </section>
+
+        <!-- TEAM SECTION -->
+        <section id="team" class="team-section">
+            <div style="text-align: center; margin-bottom: 50px;">
+                <h2 class="section-title">DAS TEAM</h2>
+            </div>
+            <div class="team-grid">
+                <!-- Adnan -->
+                <div class="team-card interactive">
+                    <div class="team-avatar">A</div>
+                    <h3 class="team-name">ADNAN</h3>
+                    <p class="team-role">Management</p>
+                </div>
+                <!-- Noah -->
+                <div class="team-card interactive">
+                    <div class="team-avatar">N</div>
+                    <h3 class="team-name">NOAH</h3>
+                    <p class="team-role">Head of Audio</p>
+                </div>
+                <!-- Frenci -->
+                <div class="team-card interactive">
+                    <div class="team-avatar">F</div>
+                    <h3 class="team-name">FRENCI</h3>
+                    <p class="team-role">Head of Video</p>
+                </div>
+                <!-- Events Placeholder -->
+                <div class="team-card interactive">
+                    <div class="team-avatar">E</div>
+                    <h3 class="team-name">EVENTS</h3>
+                    <p class="team-role">Event Planning</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SERVICES -->
+        <section id="services" class="services-section">
+            <div style="text-align: center; margin-bottom: 50px;">
+                <h2 class="section-title">WAS WIR TUN</h2>
+            </div>
+            
+            <div class="tabs-nav">
+                <button class="tab-btn active interactive" onclick="openTab('audio')">AUDIO</button>
+                <button class="tab-btn interactive" onclick="openTab('video')">VIDEO</button>
+                <button class="tab-btn interactive" onclick="openTab('event')">EVENTS</button>
+            </div>
+
+            <div id="audio" class="service-container active">
+                <div class="service-grid">
+                    <div class="service-card interactive">
+                        <h3>MUSIK</h3>
+                        <ul class="service-list">
+                            <li>Recording <span class="rolling-number"><span>01</span><span>01</span></span></li>
+                            <li>Mixing <span class="rolling-number"><span>02</span><span>02</span></span></li>
+                            <li>Mastering <span class="rolling-number"><span>03</span><span>03</span></span></li>
+                            <li>Beatproduction <span class="rolling-number"><span>04</span><span>04</span></span></li>
+                            <li>Vocal Production <span class="rolling-number"><span>05</span><span>05</span></span></li>
+                            <li>Writing <span class="rolling-number"><span>06</span><span>06</span></span></li>
+                        </ul>
+                        <a href="#contact" class="book-btn interactive" onclick="prefill('Audio - Musik')">PROJEKTANFRAGE</a>
+                    </div>
+                    <div class="service-card interactive">
+                        <h3>FILM & WERBUNG</h3>
+                        <ul class="service-list">
+                            <li>Head of Audio (Projektleitung) <span class="rolling-number"><span>01</span><span>01</span></span></li>
+                            <li>Sounddesign <span class="rolling-number"><span>02</span><span>02</span></span></li>
+                            <li>Voice Recording (Synchron) <span class="rolling-number"><span>03</span><span>03</span></span></li>
+                            <li>Mixing & Mastering <span class="rolling-number"><span>04</span><span>04</span></span></li>
+                            <li>Setaufnahmen <span class="rolling-number"><span>05</span><span>05</span></span></li>
+                        </ul>
+                        <a href="#contact" class="book-btn interactive" onclick="prefill('Audio - Film & Werbung')">PROJEKTANFRAGE</a>
+                    </div>
+                    <div class="service-card interactive">
+                        <h3>PODCAST</h3>
+                        <ul class="service-list">
+                            <li>Podcast Recording <span class="rolling-number"><span>01</span><span>01</span></span></li>
+                            <li>Schnitt (Postproduktion) <span class="rolling-number"><span>02</span><span>02</span></span></li>
+                            <li>Setups <span class="rolling-number"><span>03</span><span>03</span></span></li>
+                            <li>Audio + Video Integration <span class="rolling-number"><span>04</span><span>04</span></span></li>
+                        </ul>
+                        <a href="#contact" class="book-btn interactive" onclick="prefill('Audio - Podcast')">PROJEKTANFRAGE</a>
+                    </div>
+                </div>
+            </div>
+
+            <div id="video" class="service-container">
+                <div class="service-grid">
+                    <div class="service-card interactive">
+                        <h3>MUSIKVIDEOS</h3>
+                        <ul class="service-list">
+                            <li>Musikvideos <span class="rolling-number"><span>01</span><span>01</span></span></li>
+                            <li>Artist Visuals <span class="rolling-number"><span>02</span><span>02</span></span></li>
+                            <li>Performance Videos <span class="rolling-number"><span>03</span><span>03</span></span></li>
+                        </ul>
+                        <a href="#contact" class="book-btn interactive" onclick="prefill('Video - Musik')">PROJEKTANFRAGE</a>
+                    </div>
+                    <div class="service-card interactive">
+                        <h3>WERBUNG</h3>
+                        <ul class="service-list">
+                            <li>Werbedrehs <span class="rolling-number"><span>01</span><span>01</span></span></li>
+                            <li>Imagefilm <span class="rolling-number"><span>02</span><span>02</span></span></li>
+                            <li>Produktvideos <span class="rolling-number"><span>03</span><span>03</span></span></li>
+                            <li>Produktfotos <span class="rolling-number"><span>04</span><span>04</span></span></li>
+                            <li>Fotografie <span class="rolling-number"><span>05</span><span>05</span></span></li>
+                        </ul>
+                        <a href="#contact" class="book-btn interactive" onclick="prefill('Video - Werbung')">PROJEKTANFRAGE</a>
+                    </div>
+                    <div class="service-card interactive">
+                        <h3>CONTENT & STUDIO</h3>
+                        <ul class="service-list">
+                            <li>Social Media Content <span class="rolling-number"><span>01</span><span>01</span></span></li>
+                            <li>Studio-Location Shootings <span class="rolling-number"><span>02</span><span>02</span></span></li>
+                            <li>Video Podcast <span class="rolling-number"><span>03</span><span>03</span></span></li>
+                        </ul>
+                        <a href="#contact" class="book-btn interactive" onclick="prefill('Video - Content')">PROJEKTANFRAGE</a>
+                    </div>
+                </div>
+            </div>
+
+            <div id="event" class="service-container">
+                <div class="service-grid">
+                    <div class="service-card interactive">
+                        <h3>PLANUNG</h3>
+                        <ul class="service-list">
+                            <li>Eventplanung <span class="rolling-number"><span>01</span><span>01</span></span></li>
+                            <li>Ablauf u. Koordination <span class="rolling-number"><span>02</span><span>02</span></span></li>
+                            <li>Konzepte <span class="rolling-number"><span>03</span><span>03</span></span></li>
+                        </ul>
+                        <a href="#contact" class="book-btn interactive" onclick="prefill('Event - Planung')">PROJEKTANFRAGE</a>
+                    </div>
+                    <div class="service-card interactive">
+                        <h3>PRODUKTION</h3>
+                        <ul class="service-list">
+                            <li>Event-Audio <span class="rolling-number"><span>01</span><span>01</span></span></li>
+                            <li>Event-Video <span class="rolling-number"><span>02</span><span>02</span></span></li>
+                            <li>Event-Fotografie <span class="rolling-number"><span>03</span><span>03</span></span></li>
+                            <li>DJ Services <span class="rolling-number"><span>04</span><span>04</span></span></li>
+                        </ul>
+                        <a href="#contact" class="book-btn interactive" onclick="prefill('Event - Produktion')">PROJEKTANFRAGE</a>
+                    </div>
+                    <div class="service-card interactive">
+                        <h3>BRANDS & CONTENT</h3>
+                        <ul class="service-list">
+                            <li>Eventcontent <span class="rolling-number"><span>01</span><span>01</span></span></li>
+                            <li>Aftermovies <span class="rolling-number"><span>02</span><span>02</span></span></li>
+                            <li>Social Clips <span class="rolling-number"><span>03</span><span>03</span></span></li>
+                        </ul>
+                        <a href="#contact" class="book-btn interactive" onclick="prefill('Event - Content')">PROJEKTANFRAGE</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTACT -->
+        <section id="contact" class="contact-section">
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <h2 class="section-title">KONTAKT</h2>
+                    <p style="color: #888; margin-bottom: 20px;">Bereit für den nächsten Schritt? Fülle das Formular aus. Wir sind reaktiv.</p>
+                    <div style="margin-top: 40px; font-family: 'Oswald'; font-size: 1.2rem;">
+                        <p>STRAUSS.DE | INFO@STRAUSS.DE</p>
+                        <p>TEL. 06050 97 10 12</p>
+                    </div>
+                </div>
+                <form class="contact-form" action="#" method="POST">
+                    <label>ABTEILUNG</label>
+                    <select id="department" class="interactive" onchange="updateMailto()">
+                        <option value="General">Allgemeine Anfrage</option>
+                        <option value="Audio">Audio</option>
+                        <option value="Video">Video</option>
+                        <option value="Event">Eventplanung</option>
+                    </select>
+                    <label>NAME</label>
+                    <input type="text" id="name" class="interactive" required>
+                    <label>PROJEKT</label>
+                    <input type="text" id="subject" class="interactive" placeholder="Wähle oben einen Service...">
+                    <label>NACHRICHT</label>
+                    <textarea id="message" class="interactive" rows="5"></textarea>
+                    <button type="submit" class="submit-btn interactive">ANFRAGE SENDEN</button>
+                </form>
+            </div>
+        </section>
+
+        <footer>
+            <p>&copy; 2025 WESTROOMZ. ALLE RECHTE VORBEHALTEN.</p>
+        </footer>
+    </main>
+
+    <script>
+        // HERO TEXT SYNC
+        const heroText = document.querySelector(".hero-sub");
+        const videos = document.querySelectorAll('video');
+
+        function syncTextWithVideo() {
+            videos.forEach(video => {
+                if (video.offsetParent !== null) {
+                    video.addEventListener('timeupdate', () => {
+                        if (video.currentTime >= 4.5) {
+                            if (gsap.getProperty(heroText, "opacity") === 0) {
+                                gsap.to(heroText, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" });
+                            }
+                        } 
+                        else if (video.currentTime < 0.5) {
+                            if (gsap.getProperty(heroText, "opacity") > 0) {
+                                gsap.set(heroText, { opacity: 0, y: 20 });
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        // VIDEO PLAY
+        document.addEventListener('DOMContentLoaded', () => {
+            gsap.set(heroText, { opacity: 0, y: 20 });
+            
+            const attemptPlay = (video) => {
+                video.muted = true; 
+                video.play().then(() => {
+                    syncTextWithVideo();
+                }).catch(e => {
+                    document.addEventListener('touchstart', () => { video.play(); syncTextWithVideo(); }, { once: true });
+                    document.addEventListener('click', () => { video.play(); syncTextWithVideo(); }, { once: true });
+                });
+            };
+            videos.forEach(video => {
+                attemptPlay(video);
+                video.addEventListener('pause', () => { if(!video.seeking) attemptPlay(video); });
+            });
+        });
+
+        // MENU TOGGLE
+        function toggleMenu() {
+            const overlay = document.querySelector('.mobile-nav-overlay');
+            const bars = document.querySelectorAll('.bar');
+            overlay.classList.toggle('active');
+            if(overlay.classList.contains('active')) {
+                bars[0].style.transform = "rotate(45deg) translate(5px, 6px)";
+                bars[1].style.opacity = "0";
+                bars[2].style.transform = "rotate(-45deg) translate(5px, -6px)";
+            } else {
+                bars[0].style.transform = "none";
+                bars[1].style.opacity = "1";
+                bars[2].style.transform = "none";
+            }
+        }
+
+        // CURSOR
+        if (window.matchMedia("(min-width: 769px)").matches) {
+            const cursor = document.querySelector('.cursor');
+            const ring = document.querySelector('.cursor-ring');
+            const body = document.body;
+            let mouseX = 0;
+            let mouseY = 0;
+            let isMoving = false;
+
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                if (!isMoving) {
+                    isMoving = true;
+                    requestAnimationFrame(updateCursor);
+                }
+            });
+
+            function updateCursor() {
+                cursor.style.left = mouseX + 'px';
+                cursor.style.top = mouseY + 'px';
+                ring.style.left = mouseX + 'px';
+                ring.style.top = mouseY + 'px';
+                isMoving = false;
+            }
+
+            const interactiveElements = document.querySelectorAll('a, button, input, select, textarea, .interactive, .tab-btn, .service-card, .team-card');
+            interactiveElements.forEach(el => {
+                el.addEventListener('mouseenter', () => body.classList.add('hovering'));
+                el.addEventListener('mouseleave', () => body.classList.remove('hovering'));
+            });
+        }
+
+        // TABS & ANIMATIONS
+        function animateTabCards(containerId) {
+            const cards = document.querySelectorAll(`#${containerId} .service-card`);
+            gsap.fromTo(cards, 
+                { y: 30, opacity: 0, autoAlpha: 0, filter: "blur(10px)" },
+                { y: 0, opacity: 1, autoAlpha: 1, filter: "blur(0px)", duration: 0.6, stagger: 0.1, ease: "power3.out", overwrite: true }
+            );
+        }
+
+        function openTab(tabName) {
+            document.querySelectorAll('.service-container').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(b => {
+                if(b.textContent.toLowerCase().includes(tabName.toLowerCase()) || 
+                  (tabName === 'event' && b.textContent.includes('EVENT'))) {
+                    b.classList.add('active');
+                }
+            });
+            animateTabCards(tabName);
+            ScrollTrigger.refresh();
+        }
+
+        // PREFILL
+        function prefill(service) {
+            document.getElementById('subject').value = service;
+            const dept = document.getElementById('department');
+            if(service.includes("Audio")) dept.value = "Audio";
+            if(service.includes("Video")) dept.value = "Video";
+            if(service.includes("Event")) dept.value = "Event";
+        }
+
+        function updateMailto() { console.log("Routing email..."); }
+
+        // SCROLL ANIMATIONS
+        gsap.registerPlugin(ScrollTrigger);
+
+        gsap.utils.toArray('.section-title').forEach(title => {
+            gsap.fromTo(title, 
+                { y: 50, opacity: 0, filter: "blur(10px)" },
+                {
+                    y: 0, opacity: 1, filter: "blur(0px)", duration: 1.2, ease: "power3.out",
+                    scrollTrigger: { 
+                        trigger: title, 
+                        start: "top 90%",
+                        toggleActions: "play reverse play reverse"
+                    }
+                }
+            );
+        });
+
+        gsap.from(".intro-text", {
+            scrollTrigger: { trigger: ".intro-text", start: "top 90%", toggleActions: "play reverse play reverse" },
+            x: 50, opacity: 0, filter: "blur(5px)", duration: 1, ease: "power3.out"
+        });
+        gsap.from(".intro-img", {
+            scrollTrigger: { trigger: ".intro-img", start: "top 90%", toggleActions: "play reverse play reverse" },
+            x: -50, opacity: 0, filter: "blur(5px)", duration: 1, ease: "power3.out"
+        });
+
+        gsap.fromTo(".team-card", 
+            { y: 50, autoAlpha: 0, filter: "blur(10px)" },
+            {
+                y: 0, autoAlpha: 1, filter: "blur(0px)", duration: 0.8, stagger: 0.1, ease: "power3.out",
+                scrollTrigger: { trigger: ".team-grid", start: "top 90%", toggleActions: "play reverse play reverse" }
+            }
+        );
+
+        ScrollTrigger.create({
+            trigger: "#services", start: "top 75%",
+            onEnter: () => animateTabCards('audio'),
+            onEnterBack: () => animateTabCards('audio'),
+            once: false 
+        });
+
+        gsap.from(".contact-info", {
+            scrollTrigger: { trigger: ".contact-grid", start: "top 90%", toggleActions: "play reverse play reverse" },
+            x: -30, opacity: 0, filter: "blur(5px)", duration: 1, ease: "power3.out"
+        });
+        gsap.from(".contact-form", {
+            scrollTrigger: { trigger: ".contact-grid", start: "top 90%", toggleActions: "play reverse play reverse" },
+            x: 30, opacity: 0, filter: "blur(5px)", duration: 1, delay: 0.2, ease: "power3.out"
+        });
+    </script>
+</body>
+</html>
