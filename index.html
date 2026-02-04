@@ -13,7 +13,6 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    
     <script src="https://unpkg.com/@studio-freight/lenis@1.0.29/dist/lenis.min.js"></script>
 
     <script>
@@ -40,71 +39,59 @@
     </script>
 
     <style>
-        /* Custom Utilities */
         body { background-color: #0a0c0a; color: #f0f0eb; overflow-x: hidden; }
-        .clip-text-image {
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            background-image: url('https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=2000&auto=format&fit=crop');
-            background-size: cover;
-            background-position: center;
+        
+        /* Loader Styles */
+        .loader { 
+            position: fixed; inset: 0; background: #0a0c0a; z-index: 10000; 
+            display: flex; justify-content: center; align-items: center; 
+            transition: transform 1s cubic-bezier(0.76, 0, 0.24, 1);
         }
         
-        /* Smooth Text Reveal Class */
-        .reveal-text span {
-            display: inline-block;
-            transform: translateY(100%);
-            opacity: 0;
-        }
+        /* Reveal Text Logic */
+        .reveal-text { overflow: hidden; display: inline-block; vertical-align: bottom; }
+        .reveal-text span { display: inline-block; transform: translateY(100%); opacity: 0; }
 
-        /* Magnetic Button Effect */
-        .magnetic-wrap { display: inline-block; position: relative; }
-        .magnetic-area { position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; z-index: 10; border-radius: 50%; }
-
-        /* Custom Cursor */
+        /* Cursor */
         .cursor-dot, .cursor-outline {
             position: fixed; top: 0; left: 0; transform: translate(-50%, -50%); pointer-events: none; z-index: 9999;
         }
         .cursor-dot { width: 8px; height: 8px; background: #d4af37; border-radius: 50%; }
         .cursor-outline { width: 40px; height: 40px; border: 1px solid rgba(212, 175, 55, 0.5); border-radius: 50%; transition: width 0.2s, height 0.2s; }
         
-        /* Marquee Animation */
+        /* Marquee */
         .marquee-container { overflow: hidden; white-space: nowrap; }
         .marquee-content { display: inline-block; animation: marquee 20s linear infinite; }
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-        /* Loader */
-        .loader { position: fixed; inset: 0; background: #0a0c0a; z-index: 10000; display: flex; justify-content: center; align-items: center; }
-        .loader-bar { width: 1px; height: 0%; background: #d4af37; transition: height 0.5s ease; }
+        /* Hide scrollbar for gallery */
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="cursor-none">
+<body class="cursor-none opacity-0 transition-opacity duration-700">
 
-    <div class="cursor-dot"></div>
-    <div class="cursor-outline"></div>
+    <div class="cursor-dot hidden md:block"></div>
+    <div class="cursor-outline hidden md:block"></div>
 
-    <div class="loader">
+    <div class="loader" id="loader">
         <div class="flex flex-col items-center gap-4">
             <h1 class="font-serif text-3xl text-hera-gold tracking-widest uppercase">Heralyth</h1>
             <div class="h-16 w-[1px] bg-hera-gray overflow-hidden relative">
-                <div class="loader-line w-full bg-hera-gold absolute top-0 h-full scale-y-0 origin-top"></div>
+                <div class="loader-line w-full bg-hera-gold absolute top-0 h-full scale-y-0 origin-top transform transition-transform duration-1000"></div>
             </div>
             <p class="text-xs font-sans text-hera-gray tracking-[0.3em]">INITIALIZING NATURE</p>
         </div>
     </div>
 
-    <nav class="fixed top-0 w-full p-8 flex justify-between items-center z-50 mix-blend-difference text-hera-cream">
+    <nav class="fixed top-0 w-full p-6 md:p-8 flex justify-between items-center z-50 mix-blend-difference text-hera-cream">
         <a href="#" class="font-serif text-xl tracking-widest hover:text-hera-gold transition-colors">HERALYTH</a>
         <div class="hidden md:flex gap-12 font-sans text-xs tracking-[0.2em] uppercase">
-            <a href="#products" class="hover:text-hera-gold transition-colors group">Kollektion<span class="block max-w-0 group-hover:max-w-full transition-all duration-500 h-px bg-hera-gold"></span></a>
-            <a href="#science" class="hover:text-hera-gold transition-colors group">Wissenschaft<span class="block max-w-0 group-hover:max-w-full transition-all duration-500 h-px bg-hera-gold"></span></a>
-            <a href="#about" class="hover:text-hera-gold transition-colors group">Philosophie<span class="block max-w-0 group-hover:max-w-full transition-all duration-500 h-px bg-hera-gold"></span></a>
+            <a href="#products" class="hover:text-hera-gold transition-colors">Kollektion</a>
+            <a href="#science" class="hover:text-hera-gold transition-colors">Wissenschaft</a>
+            <a href="#about" class="hover:text-hera-gold transition-colors">Philosophie</a>
         </div>
-        <div class="magnetic-wrap">
-            <div class="magnetic-area"></div>
-            <button class="border border-hera-cream/30 px-6 py-2 rounded-full text-xs tracking-widest hover:bg-hera-gold hover:text-hera-dark hover:border-hera-gold transition-all duration-300">SHOP</button>
-        </div>
+        <button class="border border-hera-cream/30 px-6 py-2 rounded-full text-xs tracking-widest hover:bg-hera-gold hover:text-hera-dark transition-all duration-300">SHOP</button>
     </nav>
 
     <main class="relative z-10 bg-noise">
@@ -117,22 +104,21 @@
 
             <div class="z-10 text-center px-4">
                 <p class="text-hera-gold text-xs md:text-sm tracking-[0.4em] uppercase mb-6 hero-sub">Clean Beauty redefined</p>
-                <h1 class="font-serif text-6xl md:text-9xl text-hera-cream leading-none mb-6 overflow-hidden reveal-text-container">
-                    <div class="reveal-text"><span>Nature's</span></div>
+                <h1 class="font-serif text-6xl md:text-9xl text-hera-cream leading-none mb-6">
+                    <div class="reveal-text"><span>Nature's</span></div><br class="md:hidden" />
                     <div class="reveal-text italic text-hera-gold"><span>Alchemy</span></div>
                 </h1>
-                <p class="font-sans text-hera-cream/70 max-w-md mx-auto mt-8 text-sm md:text-base leading-relaxed hero-desc opacity-0 transform translate-y-4">
-                    Erleben Sie die Symbiose aus fermentiertem Knoblauch-Extrakt und moderner Molekularwissenschaft. Für Haar, das lebt.
+                <p class="font-sans text-hera-cream/70 max-w-md mx-auto mt-8 text-sm md:text-base leading-relaxed hero-desc opacity-0">
+                    Erleben Sie die Symbiose aus fermentiertem Knoblauch-Extrakt und moderner Molekularwissenschaft.
                 </p>
             </div>
-
+            
             <div class="absolute bottom-12 flex flex-col items-center gap-2 opacity-50 animate-bounce">
-                <div class="w-[1px] h-12 bg-hera-cream"></div>
                 <span class="text-[10px] tracking-widest uppercase">Scroll</span>
             </div>
         </section>
 
-        <div class="py-8 border-y border-hera-cream/10 bg-hera-dark z-20 relative">
+        <div class="py-6 md:py-8 border-y border-hera-cream/10 bg-hera-dark z-20 relative">
             <div class="marquee-container font-serif italic text-2xl md:text-4xl text-hera-cream/40">
                 <div class="marquee-content">
                     Vitalität &nbsp;•&nbsp; Stärke &nbsp;•&nbsp; Fermentierter Knoblauch &nbsp;•&nbsp; 100% Vegan &nbsp;•&nbsp; Ohne Parabene &nbsp;•&nbsp; Premium Care &nbsp;•&nbsp; 
@@ -141,270 +127,149 @@
             </div>
         </div>
 
-        <section id="science" class="py-32 px-4 md:px-12 bg-hera-dark relative">
+        <section id="science" class="py-20 md:py-32 px-4 md:px-12 bg-hera-dark relative">
             <div class="max-w-7xl mx-auto">
-                <div class="mb-20">
+                <div class="mb-16">
                     <h2 class="font-serif text-4xl md:text-6xl mb-4">Die Essenz <span class="text-hera-gold italic">der Kraft</span></h2>
-                    <p class="text-hera-cream/60 max-w-xl">Unsere Formel bricht mit Konventionen. Wir nutzen die unterschätzte Kraft der Natur in ihrer reinsten Form.</p>
+                    <p class="text-hera-cream/60 max-w-xl">Unsere Formel bricht mit Konventionen. Wir nutzen die unterschätzte Kraft der Natur.</p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 md:grid-rows-2 gap-4 h-auto md:h-[800px]">
-                    <div class="md:col-span-2 md:row-span-2 bg-hera-green/30 rounded-3xl border border-hera-cream/5 p-8 relative overflow-hidden group hover:border-hera-gold/30 transition-all duration-500 bento-card">
+                    <div class="md:col-span-2 md:row-span-2 bg-hera-green/30 rounded-3xl border border-hera-cream/5 p-8 relative overflow-hidden group bento-card min-h-[400px]">
                         <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1615486511484-92e172cc4fe0?q=80&w=1887&auto=format&fit=crop')] bg-cover bg-center opacity-40 group-hover:scale-110 transition-transform duration-1000"></div>
                         <div class="relative z-10 h-full flex flex-col justify-end">
                             <h3 class="font-serif text-3xl md:text-5xl mb-2">Black Garlic Ferment</h3>
-                            <p class="text-hera-cream/80 text-sm md:text-lg max-w-md">Reich an Antioxidantien und Schwefelverbindungen. Stimuliert die Follikel für ungeahntes Wachstum und Widerstandskraft.</p>
-                            <button class="mt-6 w-12 h-12 rounded-full border border-hera-cream/30 flex items-center justify-center hover:bg-hera-gold hover:text-hera-dark transition-colors">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
-                            </button>
+                            <p class="text-hera-cream/80 text-sm md:text-lg max-w-md">Stimuliert die Follikel für ungeahntes Wachstum und Widerstandskraft.</p>
                         </div>
                     </div>
-
-                    <div class="bg-[#1a1c1a] rounded-3xl border border-hera-cream/5 p-8 flex flex-col justify-between group hover:bg-hera-green/20 transition-all duration-500 bento-card">
-                        <div class="w-full flex justify-end text-hera-gold opacity-50 group-hover:opacity-100"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><circle cx="12" cy="12" r="10"/></svg></div>
-                        <div>
-                            <h4 class="font-serif text-2xl text-hera-cream mb-2">Aloe Barbadensis</h4>
-                            <p class="text-xs text-hera-cream/50">Tiefenhydratation ohne zu beschweren.</p>
-                        </div>
+                    <div class="bg-[#1a1c1a] rounded-3xl border border-hera-cream/5 p-8 flex flex-col justify-center gap-4 bento-card">
+                        <h4 class="font-serif text-2xl text-hera-cream">Aloe Barbadensis</h4>
+                        <p class="text-xs text-hera-cream/50">Tiefenhydratation ohne zu beschweren.</p>
                     </div>
-
-                    <div class="bg-[#1a1c1a] rounded-3xl border border-hera-cream/5 p-8 flex flex-col justify-between group hover:bg-hera-green/20 transition-all duration-500 bento-card">
-                        <div class="w-full flex justify-end text-hera-gold opacity-50 group-hover:opacity-100"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
-                        <div>
-                            <h4 class="font-serif text-2xl text-hera-cream mb-2">Keratin Komplex</h4>
-                            <p class="text-xs text-hera-cream/50">Struktureller Wiederaufbau der Haarfaser.</p>
-                        </div>
+                    <div class="bg-[#1a1c1a] rounded-3xl border border-hera-cream/5 p-8 flex flex-col justify-center gap-4 bento-card">
+                        <h4 class="font-serif text-2xl text-hera-cream">Keratin Komplex</h4>
+                        <p class="text-xs text-hera-cream/50">Struktureller Wiederaufbau.</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="products" class="py-20 bg-[#0f0f0f] overflow-hidden">
-            <div class="container mx-auto px-6 mb-12 flex justify-between items-end">
+        <section id="products" class="py-20 bg-[#0f0f0f]">
+            <div class="container mx-auto px-6 mb-12">
                 <h2 class="font-serif text-4xl md:text-5xl">Die Kollektion</h2>
-                <div class="hidden md:flex gap-4">
-                    <button class="w-12 h-12 rounded-full border border-hera-cream/20 flex items-center justify-center hover:bg-hera-cream hover:text-hera-dark transition-all">←</button>
-                    <button class="w-12 h-12 rounded-full border border-hera-cream/20 flex items-center justify-center hover:bg-hera-cream hover:text-hera-dark transition-all">→</button>
-                </div>
             </div>
-
-            <div class="flex gap-8 px-6 overflow-x-auto pb-12 scrollbar-hide snap-x">
-                <div class="min-w-[300px] md:min-w-[400px] snap-center group cursor-pointer">
-                    <div class="h-[500px] bg-[#141414] rounded-none relative overflow-hidden mb-6">
-                        <div class="absolute inset-0 flex items-center justify-center">
-                            <div class="w-32 h-64 bg-gradient-to-br from-hera-green to-black rounded-t-full border border-hera-gold/20 relative group-hover:scale-105 transition-transform duration-500">
-                                <div class="absolute bottom-4 w-full text-center text-[10px] tracking-widest text-hera-gold">HERALYTH</div>
-                            </div>
+            <div class="flex gap-6 px-6 overflow-x-auto pb-12 scrollbar-hide snap-x">
+                <div class="min-w-[280px] md:min-w-[400px] snap-center cursor-pointer">
+                    <div class="h-[400px] md:h-[500px] bg-[#141414] mb-6 relative flex items-center justify-center overflow-hidden group">
+                         <div class="w-32 h-64 bg-gradient-to-b from-hera-gray to-black border border-hera-gold/20 rounded-t-full relative group-hover:scale-105 transition duration-500">
+                             <div class="absolute bottom-10 left-0 right-0 text-center text-[10px] text-hera-gold tracking-widest">SHAMPOO</div>
                         </div>
-                        <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-all duration-500"></div>
-                        <div class="absolute top-4 right-4 text-xs font-mono text-hera-gold border border-hera-gold px-2 py-1 rounded-full">BESTSELLER</div>
                     </div>
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h3 class="font-serif text-2xl mb-1 group-hover:text-hera-gold transition-colors">Garlic Vitality Shampoo</h3>
-                            <p class="text-sm text-hera-cream/50">Für Wachstum & Volumen</p>
-                        </div>
-                        <span class="font-mono text-hera-gold">€34.00</span>
-                    </div>
+                    <h3 class="font-serif text-2xl">Garlic Vitality</h3>
+                    <p class="text-hera-gold">€34.00</p>
                 </div>
-
-                <div class="min-w-[300px] md:min-w-[400px] snap-center group cursor-pointer">
-                    <div class="h-[500px] bg-[#141414] rounded-none relative overflow-hidden mb-6">
-                        <div class="absolute inset-0 flex items-center justify-center">
-                            <div class="w-24 h-56 bg-gradient-to-br from-yellow-900/40 to-black rounded-full border border-hera-gold/20 relative group-hover:scale-105 transition-transform duration-500">
-                                <div class="absolute bottom-4 w-full text-center text-[10px] tracking-widest text-hera-gold">HERALYTH</div>
-                            </div>
+                 <div class="min-w-[280px] md:min-w-[400px] snap-center cursor-pointer">
+                    <div class="h-[400px] md:h-[500px] bg-[#141414] mb-6 relative flex items-center justify-center overflow-hidden group">
+                        <div class="w-24 h-56 bg-gradient-to-b from-hera-gray to-black border border-hera-gold/20 rounded-full relative group-hover:scale-105 transition duration-500">
+                            <div class="absolute bottom-10 left-0 right-0 text-center text-[10px] text-hera-gold tracking-widest">OIL</div>
                         </div>
                     </div>
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h3 class="font-serif text-2xl mb-1 group-hover:text-hera-gold transition-colors">Repair Hair Oil</h3>
-                            <p class="text-sm text-hera-cream/50">Mit Argan & Keratin</p>
-                        </div>
-                        <span class="font-mono text-hera-gold">€42.00</span>
-                    </div>
-                </div>
-
-                <div class="min-w-[300px] md:min-w-[400px] snap-center group cursor-pointer">
-                    <div class="h-[500px] bg-[#141414] rounded-none relative overflow-hidden mb-6">
-                        <div class="absolute inset-0 flex items-center justify-center">
-                            <div class="w-32 h-32 bg-gradient-to-br from-hera-cream/20 to-black rounded-full border border-hera-gold/20 relative group-hover:scale-105 transition-transform duration-500 flex items-center justify-center">
-                                <div class="text-[8px] tracking-widest text-hera-gold">MASK</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h3 class="font-serif text-2xl mb-1 group-hover:text-hera-gold transition-colors">Intense Recovery Mask</h3>
-                            <p class="text-sm text-hera-cream/50">Tiefenpflege über Nacht</p>
-                        </div>
-                        <span class="font-mono text-hera-gold">€38.00</span>
-                    </div>
+                    <h3 class="font-serif text-2xl">Repair Elixir</h3>
+                    <p class="text-hera-gold">€42.00</p>
                 </div>
             </div>
         </section>
 
-        <section class="min-h-[80vh] flex items-center justify-center relative bg-hera-green overflow-hidden">
-            <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center opacity-10 mix-blend-overlay"></div>
-            
-            <div class="text-center z-10">
-                <h2 class="font-serif text-5xl md:text-8xl mb-8 opacity-90">Bereit für <br>Veränderung?</h2>
-                <div class="magnetic-wrap inline-block">
-                    <div class="magnetic-area"></div>
-                    <button class="bg-hera-gold text-hera-dark px-12 py-4 rounded-full text-lg font-bold tracking-widest hover:scale-110 transition-transform duration-300">
-                        ZUR KOLLEKTION
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <footer class="bg-hera-dark py-12 px-6 border-t border-hera-cream/10">
-            <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-                <div class="text-center md:text-left">
-                    <h3 class="font-serif text-2xl text-hera-gold">HERALYTH</h3>
-                    <p class="text-xs text-hera-cream/40 mt-2">© 2026 Heralyth Germany. All rights reserved.</p>
-                </div>
-                <div class="flex gap-8 text-sm text-hera-cream/60">
-                    <a href="#" class="hover:text-hera-gold">Impressum</a>
-                    <a href="#" class="hover:text-hera-gold">Datenschutz</a>
-                    <a href="#" class="hover:text-hera-gold">Instagram</a>
-                </div>
-            </div>
+        <footer class="bg-hera-dark py-12 px-6 border-t border-hera-cream/10 text-center md:text-left">
+            <h3 class="font-serif text-2xl text-hera-gold">HERALYTH</h3>
+            <p class="text-xs text-hera-cream/40 mt-2">© 2026 Heralyth Germany.</p>
         </footer>
 
     </main>
 
     <script>
-        // --- Initialization ---
-        gsap.registerPlugin(ScrollTrigger);
-        
-        // Lenis Smooth Scroll Setup
-        const lenis = new Lenis({
-            duration: 1.2,
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-            direction: 'vertical',
-            gestureDirection: 'vertical',
-            smooth: true,
-            mouseMultiplier: 1,
-            smoothTouch: false,
-            touchMultiplier: 2,
-        });
-
-        function raf(time) {
-            lenis.raf(time);
-            requestAnimationFrame(raf);
-        }
-        requestAnimationFrame(raf);
-
-        // --- Animations ---
-
-        // 1. Loader Animation
-        const tlLoader = gsap.timeline();
-        tlLoader.to(".loader-line", {
-            scaleY: 1,
-            duration: 1.5,
-            ease: "power4.inOut"
-        })
-        .to(".loader", {
-            yPercent: -100,
-            duration: 1,
-            ease: "expo.inOut",
-            delay: 0.2
-        })
-        .from(".reveal-text span", {
-            y: "100%",
-            stagger: 0.2,
-            duration: 1.2,
-            ease: "power4.out"
-        }, "-=0.5")
-        .to(".hero-desc", {
-            opacity: 1,
-            y: 0,
-            duration: 1,
-            ease: "power2.out"
-        }, "-=0.8");
-
-        // 2. Parallax Background
-        gsap.to(".parallax-bg", {
-            scrollTrigger: {
-                trigger: "body",
-                start: "top top",
-                end: "bottom bottom",
-                scrub: true
-            },
-            yPercent: 20,
-            scale: 1.2
-        });
-
-        // 3. Bento Grid Reveal
-        const cards = document.querySelectorAll('.bento-card');
-        cards.forEach((card, index) => {
-            gsap.from(card, {
-                scrollTrigger: {
-                    trigger: card,
-                    start: "top 85%",
-                },
-                y: 50,
-                opacity: 0,
-                duration: 1,
-                delay: index * 0.1,
-                ease: "power3.out"
-            });
-        });
-
-        // 4. Magnetic Buttons (Simulating ReactBits Cursor Effect)
-        const magneticWraps = document.querySelectorAll('.magnetic-wrap');
-        const cursorDot = document.querySelector('.cursor-dot');
-        const cursorOutline = document.querySelector('.cursor-outline');
-
-        // Basic Cursor Follow
-        window.addEventListener('mousemove', (e) => {
-            const posX = e.clientX;
-            const posY = e.clientY;
-
-            // Dot follows instantly
-            cursorDot.style.left = `${posX}px`;
-            cursorDot.style.top = `${posY}px`;
-
-            // Outline follows with slight delay (using GSAP for smoothness)
-            gsap.to(cursorOutline, {
-                x: posX - 20, // offset half width/height roughly for centering logic handled in CSS transform
-                y: posY - 20,
-                duration: 0.15,
-                ease: "power2.out"
-            });
+        // --- SICHERHEITS-MECHANISMUS ---
+        // Dies garantiert, dass der Loader nach max. 3.5 Sekunden verschwindet,
+        // auch wenn Animationen fehlschlagen.
+        window.addEventListener('load', () => {
+            document.body.style.opacity = '1';
             
-            // Fix CSS transform centering conflict
-            cursorOutline.style.left = `${posX}px`;
-            cursorOutline.style.top = `${posY}px`;
+            // Fallback Timeout
+            setTimeout(() => {
+                const loader = document.getElementById('loader');
+                if(loader) {
+                    loader.style.transform = 'translateY(-100%)';
+                }
+            }, 3500);
+
+            initAnimations();
         });
 
-        magneticWraps.forEach(wrap => {
-            const area = wrap.querySelector('.magnetic-area');
-            const btn = wrap.querySelector('button');
+        function initAnimations() {
+            // Check if GSAP loaded
+            if (typeof gsap === 'undefined') {
+                console.warn('GSAP failed to load. Running fallback.');
+                document.getElementById('loader').style.display = 'none';
+                return;
+            }
 
-            wrap.addEventListener('mousemove', (e) => {
-                const rect = wrap.getBoundingClientRect();
-                const x = e.clientX - rect.left - rect.width / 2;
-                const y = e.clientY - rect.top - rect.height / 2;
+            gsap.registerPlugin(ScrollTrigger);
+
+            // 1. Loader Animation
+            const tl = gsap.timeline();
+            
+            tl.to(".loader-line", {
+                scaleY: 1,
+                duration: 1.5,
+                ease: "power2.inOut"
+            })
+            .to("#loader", {
+                yPercent: -100,
+                duration: 1.2,
+                ease: "expo.inOut",
+            })
+            .from(".reveal-text span", {
+                y: "100%",
+                stagger: 0.1,
+                duration: 1,
+                ease: "power3.out"
+            }, "-=0.5")
+            .to(".hero-desc", {
+                opacity: 1,
+                duration: 1
+            }, "-=0.8");
+
+            // 2. Parallax
+            gsap.to(".parallax-bg", {
+                scrollTrigger: {
+                    trigger: "body",
+                    start: "top top",
+                    scrub: true
+                },
+                yPercent: 20
+            });
+
+            // 3. Cursor Logic (Desktop only)
+            if (window.matchMedia("(min-width: 768px)").matches) {
+                const dot = document.querySelector('.cursor-dot');
+                const outline = document.querySelector('.cursor-outline');
                 
-                gsap.to(btn, {
-                    x: x * 0.3,
-                    y: y * 0.3,
-                    duration: 0.3,
-                    ease: "power2.out"
+                window.addEventListener('mousemove', (e) => {
+                    gsap.to(dot, { x: e.clientX, y: e.clientY, duration: 0 });
+                    gsap.to(outline, { x: e.clientX, y: e.clientY, duration: 0.15 });
                 });
+            }
 
-                // Cursor Expand effect
-                gsap.to(cursorOutline, { scale: 1.5, borderColor: "transparent", backgroundColor: "rgba(212,175,55,0.1)", duration: 0.3 });
-            });
-
-            wrap.addEventListener('mouseleave', () => {
-                gsap.to(btn, { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1, 0.3)" });
-                gsap.to(cursorOutline, { scale: 1, borderColor: "rgba(212,175,55,0.5)", backgroundColor: "transparent", duration: 0.3 });
-            });
-        });
-
+            // 4. Smooth Scroll (Lenis)
+            if (typeof Lenis !== 'undefined') {
+                const lenis = new Lenis();
+                function raf(time) {
+                    lenis.raf(time);
+                    requestAnimationFrame(raf);
+                }
+                requestAnimationFrame(raf);
+            }
+        }
     </script>
 </body>
 </html>
